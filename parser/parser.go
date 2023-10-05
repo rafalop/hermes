@@ -12,6 +12,7 @@ import (
 const (
 	CpuProfileJob     = "cpu_profile"
 	MemleakProfileJob = "memleak_profile"
+	IoLatencyJob      = "io_latency"
 )
 
 type ParserInstance interface {
@@ -43,6 +44,10 @@ func (parser *Parser) getTaskParser(jobName string, taskType common.TaskType) (P
 		MemleakProfileJob: {
 			common.MemoryInfo: GetMemoryInfoParser,
 			common.Ebpf:       GetMemoryAllocEbpfParser,
+		},
+		IoLatencyJob: {
+			common.CpuInfo: GetCpuInfoParser,
+			common.Ebpf:    GetIoLatEbpfParser,
 		},
 	}
 
