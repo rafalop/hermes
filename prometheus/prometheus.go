@@ -25,27 +25,30 @@ func HermesPrometheusHandler(reg prometheus.Gatherer) gin.HandlerFunc {
 
 // Overarching exporter, with 'sub exporters'
 type HermesExporter struct {
-	Io *IoLatExporter
+	Io  *IoLatExporter
+	Cpu *CpuExporter
 }
 
 // func NewHermesExporter(viewDir string, dataDir string) *HermesExporter {
 func NewHermesExporter(viewDir string, dataDir string) *HermesExporter {
 	return &HermesExporter{
-		Io: NewIoLatExporter(viewDir, dataDir),
+		Io:  NewIoLatExporter(PREFIX+"_io", viewDir, dataDir),
+		Cpu: NewCpuExporter(PREFIX+"_cpu", viewDir),
 	}
 }
 
 func (h *HermesExporter) Collect(ch chan<- prometheus.Metric) {
 	h.Io.Collect(ch)
+	h.Cpu.Collect(ch)
 }
 
 func (h *HermesExporter) Describe(ch chan<- *prometheus.Desc) {
 	h.Io.Describe(ch)
+	h.Cpu.Describe(ch)
 }
 
 // Return latest data as bytes based on parsed dirs (timestamp named)
 // TODO? parsed data could be obtained from the hermes web server instead of filesytsem
-// especially if other storage engines are implemented
 func GetLatestParsedDataAsBytes(path string, kind string) ([]byte, error) {
 	sourceDir := filepath.Join(path, kind)
 	latestDir, err := GetLatestParsedDataDir(sourceDir)
@@ -108,7 +111,7 @@ func GetLatestRawDataAsBytes(datadir string, postfix string) ([]byte, error) {
 	return ioutil.ReadFile(fullpath)
 }
 
-// Return byte data from a file
+// Return byte data directly from a file
 func GetBytesFromFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
