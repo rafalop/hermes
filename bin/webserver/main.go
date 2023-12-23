@@ -33,7 +33,7 @@ func init() {
 
 	flag.StringVar(&frontendDir, "frontend_dir", metadataDir+common.FrontendDirDefault, "The path of frontend directory")
 	flag.StringVar(&viewDir, "view_dir", homeDir+common.ViewDirDefault, "The path of view directory")
-	flag.StringVar(&rawDataDir, "raw_dir", homeDir+common.LogDirDefault+"/data", "The path of raw data directory (prometheus only)")
+	flag.StringVar(&rawDataDir, "raw_dir", common.LogDirDefault+"/data", "The path of raw data directory (prometheus only)")
 	flag.Usage = usage
 	flag.BoolVar(&runPrometheusExporter, "prometheus", false, "Whether to serve the prometheus exporter at /metrics")
 }
