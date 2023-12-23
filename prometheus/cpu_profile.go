@@ -45,7 +45,7 @@ func (c *CpuExporter) Collect(ch chan<- prometheus.Metric) {
 
 // collect data from post-parsed hermes data files
 func (c *CpuExporter) collectParsed(ch chan<- prometheus.Metric) {
-	// get total cpu percent
+	// get overview
 	var overviewRecs []parser.CpuInfoRecord
 	overviewBytes, err := GetBytesFromFile(filepath.Join(c.viewDir, parser.CpuProfileJob, "overview"))
 	if err != nil {
@@ -58,20 +58,15 @@ func (c *CpuExporter) collectParsed(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	// Get cpu percent for latest
+	// get cpu percent for latest
 	var latest int64
 	var cpuPercent uint64
 	var triggered bool
 	for i, rec := range overviewRecs {
-		if i == 0 {
+		if rec.Timestamp > latest || i == 0 {
 			latest = rec.Timestamp
-			continue
-		} else {
-			if rec.Timestamp > latest {
-				latest = rec.Timestamp
-				cpuPercent = rec.Val
-				triggered = rec.Triggered
-			}
+			cpuPercent = rec.Val
+			triggered = rec.Triggered
 		}
 	}
 
